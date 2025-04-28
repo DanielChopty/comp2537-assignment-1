@@ -30,7 +30,8 @@ app.use(express.static('public'));
 // Sessions database configuration
 var mongoStore = MongoStore.create({
     mongoUrl: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/${mongodb_database_sessions}?retryWrites=true&w=majority`,
-    crypto: { secret: mongodb_session_secret }, 
+    collectionName: 'sessions', 
+    crypto: { secret: mongodb_session_secret },
 });
 
 app.use(session({
