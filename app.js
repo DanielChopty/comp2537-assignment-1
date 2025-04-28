@@ -8,6 +8,13 @@ const Joi = require('joi');
 const { database } = require('./databaseConnection');
 const saltRounds = 12;
 
+const mongodb_host = process.env.MONGODB_HOST;
+const mongodb_user = process.env.MONGODB_USER;
+const mongodb_password = process.env.MONGODB_PASSWORD;
+const mongodb_database_sessions = process.env.MONGODB_DATABASE_SESSIONS;
+const mongodb_session_secret = process.env.MONGODB_SESSION_SECRET;
+const node_session_secret = process.env.NODE_SESSION_SECRET;
+
 const app = express();
 const port = process.env.PORT || 3000;
 const expireTime = 60 * 60 * 1000; // 1 hour expiry for session
@@ -21,15 +28,14 @@ app.use(express.urlencoded({ extended: false }));
 // Serve static files (images, CSS, etc.) from the 'public' folder
 app.use(express.static('public'));
 
-// Session configuration
+// Sessions database configuration
 var mongoStore = MongoStore.create({
-    mongoUrl: `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_HOST}/${process.env.MONGODB_DATABASE}?retryWrites=true&w=majority`,
-    crypto: { secret: process.env.MONGODB_SESSION_SECRET }, // Use mongodb_session_secret here for session encryption
-    ttl: 60 * 60 // 1 hour session expiration
+    mongoUrl: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/${mongodb_database_sessions}?retryWrites=true&w=majority`,
+    crypto: { secret: mongodb_session_secret }, 
 });
 
 app.use(session({
-    secret: process.env.NODE_SESSION_SECRET, // Use node_session_secret here for signing session cookies
+    secret: node_session_secret,
     store: mongoStore,
     saveUninitialized: false,
     resave: true
