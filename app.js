@@ -1,3 +1,4 @@
+// app.js
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
@@ -22,12 +23,13 @@ app.use(express.static('public'));
 
 // Session configuration
 var mongoStore = MongoStore.create({
-    mongoUrl: `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_HOST}/sessions`,
-    crypto: { secret: process.env.MONGODB_SESSION_SECRET }
+    mongoUrl: `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_HOST}/${process.env.MONGODB_DATABASE}?retryWrites=true&w=majority`,
+    crypto: { secret: process.env.MONGODB_SESSION_SECRET }, // Use mongodb_session_secret here for session encryption
+    ttl: 60 * 60 // 1 hour session expiration
 });
 
 app.use(session({
-    secret: process.env.NODE_SESSION_SECRET,
+    secret: process.env.NODE_SESSION_SECRET, // Use node_session_secret here for signing session cookies
     store: mongoStore,
     saveUninitialized: false,
     resave: true
